@@ -41,11 +41,11 @@ public:
     ~ArenaAllocator();
 
     template<typename T>
-    [[nodiscard]] T *alloc();
+    T *alloc();
 
     template<typename T, typename... Args>
         requires std::is_destructible_v<T> && std::is_constructible_v<T, Args...>
-    [[nodiscard]] T *emplace(Args &&...args);
+    T *emplace(Args &&...args);
 
 private:
     size_t m_size;
