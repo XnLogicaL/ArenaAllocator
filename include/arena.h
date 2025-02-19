@@ -13,8 +13,6 @@
 #include <unordered_map>
 #include <utility>
 
-namespace {
-
 class ArenaAllocator {
 public:
     using Destructor = std::function<void(void *)>;
@@ -38,14 +36,7 @@ public:
     }
 
     ArenaAllocator &operator=(ArenaAllocator &&other) noexcept;
-    ~ArenaAllocator()
-    {
-        for (const auto &[ptr, destructor] : m_destructor_map) {
-            destructor(ptr);
-        }
-
-        delete[] m_buffer;
-    }
+    ~ArenaAllocator();
 
     template<typename T>
     T *alloc();
@@ -63,7 +54,5 @@ private:
     template<typename T>
     void register_destructor(T *ptr);
 };
-
-} // namespace
 
 #endif
