@@ -4,5 +4,5 @@ set(CMAKE_CXX_STANDARD 23)
 
 project(ArenaAllocator)
 
-add_library(ArenaAllocator "${PROJECT_SOURCE_DIR}/src/arena.cpp")
+add_library(ArenaAllocator SHARED "${PROJECT_SOURCE_DIR}/src/arena.cpp")
 target_include_directories(ArenaAllocator PUBLIC "${PROJECT_SOURCE_DIR}/include")
