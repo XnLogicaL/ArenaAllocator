@@ -1,0 +1,7 @@
+-std=c++23
+-O3
+-Wextra
+-Wall
+-g
+-xc++
+-Iinclude
