@@ -12,6 +12,15 @@ ArenaAllocator &ArenaAllocator::operator=(ArenaAllocator &&other) noexcept
     return *this;
 }
 
+ArenaAllocator::~ArenaAllocator()
+{
+    for (const auto &[ptr, destructor] : m_destructor_map) {
+        destructor(ptr);
+    }
+
+    delete[] m_buffer;
+}
+
 template<typename T>
 T *ArenaAllocator::alloc()
 {
@@ -44,15 +53,6 @@ void ArenaAllocator::register_destructor(T *ptr)
         T *t_ptr = reinterpret_cast<T *>(obj_ptr);
         t_ptr->~T();
     };
-}
-
-ArenaAllocator::~ArenaAllocator()
-{
-    for (const auto &[ptr, destructor] : m_destructor_map) {
-        destructor(ptr);
-    }
-
-    delete[] m_buffer;
 }
 
 } // namespace
