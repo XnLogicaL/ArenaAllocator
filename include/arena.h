@@ -38,7 +38,14 @@ public:
     }
 
     ArenaAllocator &operator=(ArenaAllocator &&other) noexcept;
-    ~ArenaAllocator();
+    ~ArenaAllocator()
+    {
+        for (const auto &[ptr, destructor] : m_destructor_map) {
+            destructor(ptr);
+        }
+
+        delete[] m_buffer;
+    }
 
     template<typename T>
     T *alloc();

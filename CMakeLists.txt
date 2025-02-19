@@ -4,5 +4,5 @@ set(CMAKE_CXX_STANDARD 23)
 
 project(ArenaAllocator)
 
-add_library(ArenaAllocator SHARED ./src/arena.cpp)
+add_library(ArenaAllocator STATIC ./src/arena.cpp)
 target_include_directories(ArenaAllocator PUBLIC ./include)
