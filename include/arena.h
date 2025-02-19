@@ -12,6 +12,7 @@
 #include <functional>
 #include <unordered_map>
 #include <utility>
+#include <memory>
 
 class ArenaAllocator {
 public:
@@ -39,11 +40,28 @@ public:
     ~ArenaAllocator();
 
     template<typename T>
-    T *alloc();
+    T *alloc()
+    {
+        size_t remaining_num_bytes = m_size - static_cast<size_t>(m_offset - m_buffer);
+        void *pointer = static_cast<void *>(m_offset);
+        void *aligned = std::align(alignof(T), sizeof(T), pointer, remaining_num_bytes);
+        if (aligned == nullptr) {
+            throw std::bad_alloc();
+        }
+
+        m_offset = static_cast<std::byte *>(aligned) + sizeof(T);
+        return static_cast<T *>(aligned);
+    }
 
     template<typename T, typename... Args>
         requires std::is_destructible_v<T> && std::is_constructible_v<T, Args...>
-    T *emplace(Args &&...args);
+    T *emplace(Args &&...args)
+    {
+        const auto allocated_memory = alloc<T>();
+        T *obj = new (allocated_memory) T{std::forward<Args>(args)...};
+        register_destructor<T>(obj);
+        return obj;
+    }
 
 private:
     size_t m_size;
@@ -52,7 +70,14 @@ private:
     std::unordered_map<void *, Destructor> m_destructor_map;
 
     template<typename T>
-    void register_destructor(T *ptr);
+    void register_destructor(T *ptr)
+    {
+        void *void_ptr = reinterpret_cast<void *>(ptr);
+        m_destructor_map[void_ptr] = [](void *obj_ptr) {
+            T *t_ptr = reinterpret_cast<T *>(obj_ptr);
+            t_ptr->~T();
+        };
+    }
 };
 
 #endif
