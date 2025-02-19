@@ -22,7 +22,7 @@ ArenaAllocator::~ArenaAllocator()
 }
 
 template<typename T>
-T *ArenaAllocator::alloc()
+[[nodiscard]] T *ArenaAllocator::alloc()
 {
     size_t remaining_num_bytes = m_size - static_cast<size_t>(m_offset - m_buffer);
     void *pointer = static_cast<void *>(m_offset);
@@ -37,7 +37,7 @@ T *ArenaAllocator::alloc()
 
 template<typename T, typename... Args>
     requires std::is_destructible_v<T> && std::is_constructible_v<T, Args...>
-T *ArenaAllocator::emplace(Args &&...args)
+[[nodiscard]] T *ArenaAllocator::emplace(Args &&...args)
 {
     const auto allocated_memory = alloc<T>();
     T *obj = new (allocated_memory) T{std::forward<Args>(args)...};
