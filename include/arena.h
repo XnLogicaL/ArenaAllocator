@@ -39,6 +39,8 @@ public:
     ArenaAllocator &operator=(ArenaAllocator &&other) noexcept;
     ~ArenaAllocator();
 
+    void *alloc_bytes(size_t num_bytes, size_t alignment = alignof(std::max_align_t));
+
     template<typename T>
     T *alloc()
     {
